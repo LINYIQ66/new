@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSS News Feed</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #150e56;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+
+    /* News Container */
+    .news-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .news-item {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 15px;
+    }
+
+    .news-item:last-child {
+      border-bottom: none;
+    }
+
+    .news-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #150e56;
+      margin-bottom: 5px;
+      text-decoration: none;
+    }
+
+    .news-title:hover {
+      text-decoration: underline;
+    }
+
+    .news-summary {
+      font-size: 1rem;
+      color: #555;
+      margin-top: 10px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #150e56;
+      color: #fff;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Latest News</h1>
+  </header>
+
+  <div class="news-container" id="news-container">
+    <!-- News items will be loaded here -->
+  </div>
+
+  <footer>
+    <p>&copy; 2025 RSS News Feed. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // RSS feed URL (via rss2json to bypass CORS restrictions)
+    const feedUrl = 'https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/rss.xml';
+
+    async function loadRSS() {
+      try {
+        const response = await fetch(feedUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        const container = document.getElementById('news-container');
+        container.innerHTML = ''; // Clear old content
+
+        data.items.forEach(item => {
+          const newsItem = `
+            <div class="news-item">
+              <a href="${item.link}" target="_blank" class="news-title">
+                ${item.title}
+              </a>
+              <div class="news-summary">${item.description || ''}</div>
+            </div>
+          `;
+          container.innerHTML += newsItem;
+        });
+      } catch (error) {
+        console.error('Error fetching RSS feed:', error);
+      }
+    }
+
+    // Load RSS feed on page load
+    loadRSS();
+    // Refresh RSS feed every 5 minutes
+    setInterval(loadRSS, 300000);
+  </script>
+</body>
+</html>
